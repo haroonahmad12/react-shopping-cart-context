@@ -1,15 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
+import CartItemContext from "../../context/CartItemContext";
 
 import ItemCard from "../ItemCard";
 
-function ProductsListing({
-  products,
-  handleDownVote,
-  handleUpVote,
-  handleSetFavorite,
-  handleAddToCart,
-  ...props
-}) {
+function ProductsListing({ ...props }) {
+  const { products } = useContext(CartItemContext);
   return (
     <section className="row" {...props}>
       {products.map((product) => (
@@ -20,12 +15,12 @@ function ProductsListing({
           title={product.title}
           shortDescription={product.shortDescription}
           upVotes={product.votes.upVotes}
-          handleUpVote={handleUpVote}
+          //  handleUpVote={handleUpVote}
           downVotes={product.votes.downVotes}
-          handleDownVote={handleDownVote}
+          // handleDownVote={handleDownVote}
           isFavorite={product.isFavorite}
-          handleSetFavorite={handleSetFavorite}
-          handleAddToCart={handleAddToCart}
+          // handleSetFavorite={handleSetFavorite}
+          //handleAddToCart={handleAddToCart}
         />
       ))}
     </section>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 
 import Home from "./pages/Home";
@@ -8,6 +8,7 @@ import * as api from "./api";
 
 import useLocalStorage from "./hooks/useLocalStorage";
 import loadLocalStorageItems from "./utils/loadLocalStorageItems";
+import CartItemContext from "./context/CartItemContext";
 
 function buildNewCartItem(cartItem) {
   if (cartItem.quantity >= cartItem.unitsInStock) {
@@ -186,20 +187,33 @@ function App() {
           <NewProduct saveNewProduct={saveNewProduct} />
         </Route>
         <Route path="/" exact>
-          <Home
-            fullWidth
-            cartItems={cartItems}
-            products={products}
-            isLoading={isLoading}
-            hasError={hasError}
-            loadingError={loadingError}
-            handleDownVote={handleDownVote}
-            handleUpVote={handleUpVote}
-            handleSetFavorite={handleSetFavorite}
-            handleAddToCart={handleAddToCart}
-            handleRemove={handleRemove}
-            handleChange={handleChange}
-          />
+          <CartItemContext.Provider
+            value={{
+              cartItems: cartItems,
+              products: products,
+              handleDownVote: handleDownVote,
+              handleUpVote: handleUpVote,
+              handleSetFavorite: handleSetFavorite,
+              handleAddToCart: handleAddToCart,
+              handleRemove: handleRemove,
+              handleChange: handleChange,
+            }}
+          >
+            <Home
+              fullWidth
+              // cartItems={cartItems}
+              // products={products}
+              // isLoading={isLoading}
+              // hasError={hasError}
+              // loadingError={loadingError}
+              // handleDownVote={handleDownVote}
+              // handleUpVote={handleUpVote}
+              // handleSetFavorite={handleSetFavorite}
+              // handleAddToCart={handleAddToCart}
+              // handleRemove={handleRemove}
+              // handleChange={handleChange}
+            />
+          </CartItemContext.Provider>
         </Route>
       </Switch>
     </BrowserRouter>
