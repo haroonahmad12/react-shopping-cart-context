@@ -4,7 +4,6 @@ import FavoriteIconButton from "../FavoriteIconButton";
 import IconButton from "../IconButton";
 import Button from "../Button";
 import { ThumbDown, ThumbUp } from "../SVGIcons";
-import CartItemContext from "../../context/CartItemContext";
 
 import "./ItemCard.scss";
 
@@ -36,13 +35,6 @@ function ItemCard({
   upVotes,
   downVotes,
 }) {
-  const {
-    handleUpVote,
-    handleDownVote,
-    handleSetFavorite,
-    handleAddToCart,
-  } = useContext(CartItemContext);
-
   function onDownVote() {
     handleDownVote(id);
   }

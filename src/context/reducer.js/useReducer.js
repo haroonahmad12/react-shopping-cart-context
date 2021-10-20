@@ -1,6 +1,7 @@
-import React, { createContext } from "react";
+import React, { createContext, useEffect, useReducer } from "react";
+import actionTypes from "./actionTypes";
 
-const initialState = {
+export const initialState = {
   cartItems: [],
   products: [],
   isLoading: false,
@@ -14,6 +15,4 @@ const initialState = {
   handleChange: () => {},
 };
 
-const CartItemContext = createContext(initialState);
-
-export default CartItemContext;
+export const ProductsContext = createContext(initialState);

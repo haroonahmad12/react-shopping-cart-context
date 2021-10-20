@@ -1,6 +1,5 @@
 function loadLocalStorageItems(storageKey, defaultValue) {
   const data = localStorage.getItem(storageKey);
-
   if (data) {
     try {
       return JSON.parse(data);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useContext, useEffect, useReducer } from "react";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 
 import Home from "./pages/Home";
@@ -8,7 +8,10 @@ import * as api from "./api";
 
 import useLocalStorage from "./hooks/useLocalStorage";
 import loadLocalStorageItems from "./utils/loadLocalStorageItems";
-import CartItemContext from "./context/CartItemContext";
+import { ProductsContext } from "./context/reducer.js/useReducer";
+import { initialState, reducer } from "./context/reducer.js/useReducer";
+import actionTypes from "./context/reducer.js/actionTypes";
+import { getProducts } from "./api";
 
 function buildNewCartItem(cartItem) {
   if (cartItem.quantity >= cartItem.unitsInStock) {
@@ -31,37 +34,64 @@ const PRODUCTS_LOCAL_STORAGE_KEY = "react-sc-state-products";
 const CART_ITEMS_LOCAL_STORAGE_KEY = "react-sc-state-cart-items";
 
 function App() {
-  const [products, setProducts] = useState(() =>
-    loadLocalStorageItems(PRODUCTS_LOCAL_STORAGE_KEY, []),
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { cartItems, products, isLoading, hasError, loadingError } = useContext(
+    ProductsContext,
   );
-  const [cartItems, setCartItems] = useState(() =>
-    loadLocalStorageItems(CART_ITEMS_LOCAL_STORAGE_KEY, []),
-  );
-
   useLocalStorage(products, PRODUCTS_LOCAL_STORAGE_KEY);
   useLocalStorage(cartItems, CART_ITEMS_LOCAL_STORAGE_KEY);
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasError, setHasError] = useState(false);
-  const [loadingError, setLoadingError] = useState(null);
+  function reducer(state, action) {
+    switch (action.type) {
+      case actionTypes.PRODUCTS_FETCHING:
+        console.log("fetching");
+
+        break;
+
+      case actionTypes.PRODUCTS_FETCHING_SUCCESS:
+        return {
+          ...state,
+          products: action.payload.products,
+          cartItems: action.payload.cartItems,
+        };
+
+        break;
+
+      case actionTypes.PRODUCTS_FETCHING_ERROR:
+        console.log("error");
+        break;
+
+      case actionTypes.CARTITEMS_FETCHING:
+        console.log("Cart Updating");
+        break;
+
+      case actionTypes.CARTITEMS_FETCHING_SUCCESS:
+        console.log("Cart Updated");
+        break;
+      case actionTypes.CARTITEMS_FETCHING_ERROR:
+        console.log("Cart Update Error");
+      default:
+        return;
+        break;
+    }
+  }
 
   useEffect(() => {
-    if (products.length === 0) {
-      setIsLoading(true);
-
-      api
-        .getProducts()
-        .then((data) => {
-          setProducts(data);
-          setIsLoading(false);
-        })
-        .catch((error) => {
-          setIsLoading(false);
-          setHasError(true);
-          setLoadingError(error.message);
+    const request = async () => {
+      dispatch({ type: actionTypes.PRODUCTS_FETCHING });
+      const data = loadLocalStorageItems("react-sc-state", []);
+      if (!data) {
+        dispatch({ type: actionTypes.PRODUCTS_FETCHING_ERROR, payload: error });
+      } else {
+        dispatch({
+          type: actionTypes.PRODUCTS_FETCHING_SUCCESS,
+          payload: data,
         });
-    }
-  }, []);
+      }
+    };
+
+    request();
+  }, [dispatch]);
 
   function handleAddToCart(productId) {
     const prevCartItem = cartItems.find((item) => item.id === productId);
@@ -187,10 +217,8 @@ function App() {
           <NewProduct saveNewProduct={saveNewProduct} />
         </Route>
         <Route path="/" exact>
-          <CartItemContext.Provider
+          <ProductsContext.Provider
             value={{
-              cartItems: cartItems,
-              products: products,
               handleDownVote: handleDownVote,
               handleUpVote: handleUpVote,
               handleSetFavorite: handleSetFavorite,
@@ -213,7 +241,7 @@ function App() {
               // handleRemove={handleRemove}
               // handleChange={handleChange}
             />
-          </CartItemContext.Provider>
+          </ProductsContext.Provider>
         </Route>
       </Switch>
     </BrowserRouter>
